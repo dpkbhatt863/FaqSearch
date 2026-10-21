@@ -1,12 +1,10 @@
-# 🔍 FaqSearch
+# FaqSearch
 
 An AI research agent that breaks down your question, searches the web in real time, verifies source credibility, and generates a cited report, with a self-correction loop that retries when quality is low.
 
-**[Live Demo →](https://your-app.streamlit.app)**
-
 ---
 
-## ⚙️ How It Works
+## How It Works
 
 ```text
 User Question
@@ -26,13 +24,13 @@ User Question
      ▼
 [Quality Check] ── Score 1-10
      │
-     ├── ≥ 7 → Done ✅
-     └── < 7 → Back to Research 🔄 (max 2 retries)
+     ├── ≥ 7 → Done
+     └── < 7 → Back to Research (max 2 retries)
 ```
 
 ---
 
-## ✨ Features
+## Features
 
 - **Query decomposition**: complex questions are split into searchable sub-questions
 - **Live web search**: real-time results, not stale training data
@@ -43,19 +41,19 @@ User Question
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-| Layer           | Tool                | Cost                  |
-|-----------------|---------------------|-----------------------|
-| LLM             | Groq (Llama 3.1 8B) | Free                  |
-| Web Search      | Tavily API          | Free (1000 calls/mo)  |
-| Agent Framework | LangGraph           | Free                  |
-| UI              | Streamlit           | Free                  |
-| Hosting         | Streamlit Cloud     | Free                  |
+| Layer           | Tool                       | Cost                  |
+|-----------------|----------------------------|-----------------------|
+| LLM             | Groq (openai/gpt-oss-120b) | Free                  |
+| Web Search      | Tavily API                 | Free (1000 calls/mo)  |
+| Agent Framework | LangGraph                  | Free                  |
+| UI              | Streamlit                  | Free                  |
+| Hosting         | Streamlit Cloud            | Free                  |
 
 ---
 
-## 🚀 Run Locally
+## Run Locally
 
 **1. Clone the repository**
 
