@@ -1,4 +1,4 @@
-# 🔍 faqSearch
+# 🔍 FaqSearch
 
 An AI research agent that breaks down your question, searches the web in real time, verifies source credibility, and generates a cited report, with a self-correction loop that retries when quality is low.
 
