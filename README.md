@@ -1,10 +1,10 @@
 # 🔬 FaqSearch
 
-An AI research pipeline that takes any question, searches the web, reads the top sources, writes a structured report, and then reviews its own work with a critic step. It comes with a Streamlit UI and a command-line mode.
+An AI research pipeline that takes any question, searches the web, reads the top sources, writes a structured report, and then reviews its own work with a critic step. It comes with a Streamlit UI.
 
 Built with **LangChain**, **Groq (gpt-oss-120b)**, **Tavily** and **Streamlit**.
 
-![ResearchMind screenshot](docs/screenshot.png)
+<img width="1900" height="876" alt="faqSearch (1)" src="https://github.com/user-attachments/assets/3a32fe21-3d11-4c18-8d75-b28b62908493" />
 
 ## How it works
 
