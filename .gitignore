@@ -2,3 +2,5 @@
 __pycache__/
 *.pyc
 .venv/
+/agentsff.py
+/pipeline.py
