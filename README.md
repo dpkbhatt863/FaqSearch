@@ -1,97 +1,92 @@
-# FaqSearch
+# 🔬 FaqSearch
 
-An AI research agent that breaks down your question, searches the web in real time, verifies source credibility, and generates a cited report, with a self-correction loop that retries when quality is low.
+An AI research pipeline that takes any question, searches the web, reads the top sources, writes a structured report, and then reviews its own work with a critic step. It comes with a Streamlit UI and a command-line mode.
 
----
+Built with **LangChain**, **Groq (gpt-oss-120b)**, **Tavily** and **Streamlit**.
 
-## How It Works
+![ResearchMind screenshot](docs/screenshot.png)
 
-```text
-User Question
-     │
-     ▼
-[Decompose]  ── Break into 2-3 sub-questions
-     │
-     ▼
-[Research]   ── Live web search via Tavily API
-     │
-     ▼
-[Verify]     ── Check domain trust + cross-reference sources
-     │
-     ▼
-[Synthesize] ── Write cited report with [1], [2] references
-     │
-     ▼
-[Quality Check] ── Score 1-10
-     │
-     ├── ≥ 7 → Done
-     └── < 7 → Back to Research (max 2 retries)
+## How it works
+
+```
+Topic ──> Search ──> Reader ──> Writer ──> Critic ──> Report
 ```
 
----
+| Stage | What it does |
+|---|---|
+| **1. Search** | An LLM rewrites your question into 3 specific search queries. Tavily runs them, and the results are merged and de-duplicated by URL. |
+| **2. Reader** | Scrapes the top pages and summarizes each one with the LLM. |
+| **3. Writer** | Writes a structured report (Introduction, Key Findings, Conclusion, Sources) from the gathered research. |
+| **4. Critic** | Scores the report out of 10 and lists strengths and areas to improve. |
+
+## Tech stack
+
+Python · LangChain · Groq · Tavily · BeautifulSoup · Streamlit
 
 ## Features
 
-- **Query decomposition**: complex questions are split into searchable sub-questions
-- **Live web search**: real-time results, not stale training data
-- **Source verification**: domain trust-list (.gov, .edu, Reuters) plus LLM cross-referencing
-- **Self-correction loop**: re-searches automatically if report quality is below 7/10
-- **Cited reports**: every claim is linked back to its source URLs
-- **One-click demo**: 5 sample questions built into the UI
+- Four-stage pipeline with live progress cards in the UI
+- Query rewriting, so vague questions still produce good search queries
+- Dictionary and junk domains are excluded from search results
+- Graceful error handling: if a step fails, the earlier results stay visible
+- Raw search results and page summaries are viewable for transparency
+- Download the final report as Markdown
+- Clickable example questions
+- Command-line mode that saves the report and critic feedback to a `.md` file
 
----
+## Project structure
 
-## Tech Stack
+```
+.
+├── app.py          # Streamlit UI
+├── agents.py       # LLM setup, search/reader functions, writer and critic chains
+├── tools.py        # Tavily search and web scraping tools
+├── requirements.txt
+└── .env            # API keys (not committed)
 
-| Layer           | Tool                       | Cost                  |
-|-----------------|----------------------------|-----------------------|
-| LLM             | Groq (openai/gpt-oss-120b) | Free                  |
-| Web Search      | Tavily API                 | Free (1000 calls/mo)  |
-| Agent Framework | LangGraph                  | Free                  |
-| UI              | Streamlit                  | Free                  |
-| Hosting         | Streamlit Cloud            | Free                  |
-
----
-
-## Run Locally
-
-**1. Clone the repository**
-
-```bash
-git clone https://github.com/YOUR_USERNAME/faqSearch.git
-cd faqSearch
 ```
 
-**2. Install dependencies**
+## Getting started
+
+### 1. Clone the repo
 
 ```bash
+git clone https://github.com/your-username/researchmind.git
+cd researchmind
+```
+
+### 2. Create a virtual environment and install dependencies
+
+```bash
+python -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-**3. Set up environment variables** (see below)
+### 3. Add your API keys
 
-**4. Start the app**
+Create a `.env` file in the project root:
+
+```env
+GROQ_API_KEY=your_groq_api_key
+TAVILY_API_KEY=your_tavily_api_key
+```
+
+- Groq key: https://console.groq.com
+- Tavily key: https://tavily.com
+
+### 4. Run it
+
+**Web app**
 
 ```bash
 streamlit run app.py
 ```
 
----
+**Command line**
 
-## 🔑 Environment Variables
-
-Create a `.env` file in the project root:
-
-```env
-GROQ_API_KEY=gsk_your_key
-TAVILY_API_KEY=tvly_your_key
+```bash
+python pipeline.py
 ```
 
-| Variable         | Where to get it                              |
-|------------------|----------------------------------------------|
-| `GROQ_API_KEY`   | [console.groq.com](https://console.groq.com) |
-| `TAVILY_API_KEY` | [tavily.com](https://tavily.com)             |
-
-> ⚠️ Never commit your `.env` file. Add it to `.gitignore`.
-
----
+The CLI prints each step and saves the report plus critic feedback as `research_report_<timestamp>.md`.
