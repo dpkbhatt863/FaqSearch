@@ -82,11 +82,3 @@ TAVILY_API_KEY=your_tavily_api_key
 ```bash
 streamlit run app.py
 ```
-
-**Command line**
-
-```bash
-python pipeline.py
-```
-
-The CLI prints each step and saves the report plus critic feedback as `research_report_<timestamp>.md`.
