@@ -1,19 +1,35 @@
 from dotenv import load_dotenv
-from datetime import date
-load_dotenv()  
+load_dotenv()
 
+import os
 import re
+from datetime import date
+
 from langchain_groq import ChatGroq
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from tools import web_search, scrape_url
 
-llm = ChatGroq(
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+if not GOOGLE_API_KEY:
+    raise RuntimeError("GOOGLE_API_KEY is not set. Add it to your .env file.")
+
+GEMINI_MODEL = "gemini-3.6-flash"
+
+gemini_llm = ChatGoogleGenerativeAI(
+    model=GEMINI_MODEL,
+    google_api_key=GOOGLE_API_KEY,
+    max_retries=3,
+)
+
+groq_llm = ChatGroq(
     model="openai/gpt-oss-120b",
     temperature=0,
     max_retries=3,
     timeout=60,
 )
+
 
 query_prompt = ChatPromptTemplate.from_messages([
     ("system", "You write web search queries. Output only the queries, one per line, no numbering, no quotes."),
@@ -23,7 +39,8 @@ and make each query a complete phrase, never a single word.
 
 Question: {topic}"""),
 ])
-query_chain = query_prompt | llm | StrOutputParser()
+query_chain = query_prompt | gemini_llm | StrOutputParser()
+
 
 def run_search(topic: str) -> str:
     try:
@@ -46,15 +63,18 @@ def run_search(topic: str) -> str:
 
     return "\n----\n".join(blocks) if blocks else "No results found."
 
+
 reader_prompt = ChatPromptTemplate.from_messages([
     ("system", "You are a research reader. Summarize the extracted page content faithfully."),
     ("human", "URL: {url}\n\nPage content:\n{content}\n\nSummarize the key information."),
 ])
-reader_chain = reader_prompt | llm | StrOutputParser()
+reader_chain = reader_prompt | gemini_llm | StrOutputParser()
+
 
 def run_reader(url: str) -> str:
     content = scrape_url.invoke({"url": url})
     return reader_chain.invoke({"url": url, "content": content})
+
 
 writer_prompt = ChatPromptTemplate.from_messages([
     ("system", "You are an expert research writer. Write clear, structured and insightful reports."),
@@ -71,9 +91,14 @@ Structure the report as:
 - Conclusion
 - Sources (list all URLs found in the research)
 
+Use ONLY the research above for facts and figures. If the research does not
+cover something, say so instead of using your own knowledge. Every key finding
+must be backed by a URL from the research.
+
 Be detailed, factual and professional."""),
 ])
-writer_chain = writer_prompt | llm | StrOutputParser()
+writer_chain = writer_prompt | gemini_llm | StrOutputParser()
+
 
 critic_prompt = ChatPromptTemplate.from_messages([
     ("system", "You are a sharp and constructive research critic. Be honest and specific."),
@@ -97,5 +122,4 @@ Areas to Improve:
 One line verdict:
 ..."""),
 ])
-
-critic_chain = critic_prompt | llm | StrOutputParser()
+critic_chain = critic_prompt | groq_llm | StrOutputParser()

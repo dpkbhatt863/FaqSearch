@@ -6,6 +6,9 @@ from agents import run_search, run_reader, writer_chain, critic_chain
 
 NUM_PAGES = 2
 
+def safe_md(text):
+    return re.sub(r"(?<!\\)\$", r"\\$", text)
+
 EXAMPLES = [
     "Which jobs will be most paid after 5 years?",
     "How is generative AI changing legal e-discovery?",
@@ -347,7 +350,7 @@ if r:
     if "writer" in r:
         with st.container(border=True):
             st.markdown('<div class="panel-label orange">Final Research Report</div>', unsafe_allow_html=True)
-            st.markdown(r["writer"])
+            st.markdown(safe_md(r["writer"]))
         st.download_button(
             label="Download Report (.md)",
             data=r["writer"],
@@ -359,7 +362,7 @@ if r:
         st.markdown("<div style='height:1rem'></div>", unsafe_allow_html=True)
         with st.container(border=True):
             st.markdown('<div class="panel-label green">Critic Feedback</div>', unsafe_allow_html=True)
-            st.markdown(r["critic"])
+            st.markdown(safe_md(r["critic"]))
 
 
 st.markdown("""
