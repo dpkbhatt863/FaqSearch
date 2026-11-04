@@ -1,27 +1,30 @@
 # 🔬 FaqSearch
 
-An AI research pipeline that takes any question, searches the web, reads the top sources, writes a structured report, and then reviews its own work with a critic step. It comes with a Streamlit UI.
+An AI research pipeline that takes any question, searches the web, reads the top sources, writes a structured report, and then has a separate model with a critic step. It comes with a Streamlit UI.
 
-Built with **LangChain**, **Groq (gpt-oss-120b)**, **Tavily** and **Streamlit**.
+Built with **LangChain**, **Gemini**, **Groq (gpt-oss-120b)**, **Tavily** and **Streamlit**.
 
 <img width="1900" height="876" alt="faqSearch (1)" src="https://github.com/user-attachments/assets/3a32fe21-3d11-4c18-8d75-b28b62908493" />
 
 ## How it works
 
 ```
-Topic ──> Search ──> Reader ──> Writer ──> Critic ──> Report
+Topic ──> Search ──> Reader ──> Writer ──> Critic ──> Report + Feedback
+          (Gemini)   (Gemini)   (Gemini)   (Groq)
 ```
 
-| Stage | What it does |
-|---|---|
-| **1. Search** | An LLM rewrites your question into 3 specific search queries. Tavily runs them, and the results are merged and de-duplicated by URL. |
-| **2. Reader** | Scrapes the top pages and summarizes each one with the LLM. |
-| **3. Writer** | Writes a structured report (Introduction, Key Findings, Conclusion, Sources) from the gathered research. |
-| **4. Critic** | Scores the report out of 10 and lists strengths and areas to improve. |
+| Stage | Model | What it does |
+|---|---|---|
+| **1. Search** | Gemini | Rewrites your question into 3 specific search queries. Tavily runs them, and the results are merged and de-duplicated by URL. |
+| **2. Reader** | Gemini | Scrapes the top pages and summarizes each one. |
+| **3. Writer** | Gemini | Writes a structured report (Introduction, Key Findings, Conclusion, Sources) using only the gathered research. |
+| **4. Critic** | Groq `gpt-oss-120b` | Scores the report out of 10 and lists strengths and areas to improve. |
+
+The critic runs on a different model from the one that wrote the report. This reduces self-preference bias, where a model is too lenient on its own output.
 
 ## Tech stack
 
-Python · LangChain · Groq · Tavily · BeautifulSoup · Streamlit
+Python · LangChain · Gemini · Groq · Tavily · BeautifulSoup · Streamlit
 
 ## Features
 
@@ -32,7 +35,6 @@ Python · LangChain · Groq · Tavily · BeautifulSoup · Streamlit
 - Raw search results and page summaries are viewable for transparency
 - Download the final report as Markdown
 - Clickable example questions
-- Command-line mode that saves the report and critic feedback to a `.md` file
 
 ## Project structure
 
