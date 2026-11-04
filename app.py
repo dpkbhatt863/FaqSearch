@@ -14,7 +14,6 @@ EXAMPLES = [
     "How is generative AI changing legal e-discovery?",
     "What are the best ways to learn LLM engineering in 2026?",
     "What are the latest breakthroughs in fusion energy?",
-    
 ]
 
 st.set_page_config(
